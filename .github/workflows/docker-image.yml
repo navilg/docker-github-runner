@@ -1,0 +1,18 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: arm64
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker ARM64 image
+      run: VERSION=$(curl -s https://api.github.com/repos/actions/runner/releases/latest | grep "tag_name" | cut -d ":" -f 2 | tr -d "v\"\, ") && docker build . --file Dockerfile --tag linuxshots/github-runner:arm64-$VERSION
