@@ -4,13 +4,15 @@ ARG group=runner
 ARG uid=1000
 ARG gid=1000
 ARG DEBIAN_FRONTEND="noninteractive"
-RUN apt update && apt install bash curl libdigest-sha-perl tar -y && \
+RUN apt update && apt install bash curl libdigest-sha-perl tar sudo -y && \
     addgroup --gid ${gid} ${group} && useradd -m -d /runner --uid ${uid} --gid ${gid} --shell /bin/bash ${user} && \
     mkdir /runner/actions-runner && \
     curl -LO https://download.docker.com/linux/static/stable/x86_64/docker-20.10.9.tgz && \
     tar xzvf docker-20.10.9.tgz && \
     cp docker/* /usr/bin/ && \
     rm -rfv docker-20.10.9.tgz docker
+
+RUN echo "${user} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/runner
 
 COPY ./container-entrypoint.sh /runner/container-entrypoint.sh
 WORKDIR /runner/actions-runner

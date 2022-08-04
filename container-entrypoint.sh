@@ -25,6 +25,11 @@ if [ -z $GHR_TOKEN ]; then
     exit 1
 fi
 
+if [ ! -z $GHR_DOCKERGID ]; then
+    grep -q docker:x:$GHR_DOCKERGID /etc/group || sudo addgroup --gid $GHR_DOCKERGID docker
+    sudo usermod -aG docker $(whoami)
+fi
+
 if [ ! -f /actions-runner/.runner ]; then
     /runner/actions-runner/./config.sh --unattended --name $GHR_NAME --labels $GHR_LABELS --url $GHR_URL --token $GHR_TOKEN
 fi
