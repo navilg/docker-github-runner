@@ -2,17 +2,33 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    tags:
+    - 'v*.*.*'
   #pull_request:
   #  branches: [ "main" ]
 
 jobs:
 
-  build:
+  build-on-arm64:
 
-    runs-on: arm64
+    runs-on: ARM64
 
     steps:
     - uses: actions/checkout@v3
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - name: Build the Docker ARM64 image
-      run: VERSION=$(curl -s https://api.github.com/repos/actions/runner/releases/latest | grep "tag_name" | cut -d ":" -f 2 | tr -d "v\"\, ") && docker build . --file Dockerfile --tag linuxshots/github-runner:arm64-$VERSION
+      run: |
+        whoami && pwd
+        docker build . --file Dockerfile.arm64 --tag linuxshots/github-runner:arm64-${{ env.RELEASE_VERSION }}
+  
+  build-on-amd64:
+    runs-on: X64
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - name: Build the Docker AMD64 image
+      run: |
+        whoami && pwd
+        docker build . --file Dockerfile --tag linuxshots/github-runner:amd64-${{ env.RELEASE_VERSION }}
