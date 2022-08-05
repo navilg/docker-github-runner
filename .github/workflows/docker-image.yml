@@ -17,9 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: FranzDiebold/github-env-vars-action@v2
     - name: Generate build-tag
-      run:  echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/*/}-$CI_SHA_SHORT)"
+      run:  echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/*/})"
       id: get_build_tag
     - name: Build and push the Docker ARM64 image
       run: |
@@ -31,9 +30,8 @@ jobs:
     runs-on: X64
     steps:
     - uses: actions/checkout@v3
-    - uses: FranzDiebold/github-env-vars-action@v2
     - name: Generate build-tag
-      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/*/}-$CI_SHA_SHORT)"
+      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/*/})"
       id: get_build_tag
     - name: Build and push the Docker AMD64 image
       run: |
@@ -48,9 +46,8 @@ jobs:
     - build-on-amd64
     steps:
     - uses: actions/checkout@v3
-    - uses: FranzDiebold/github-env-vars-action@v2
     - name: Generate build-tag
-      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/*/}-$CI_SHA_SHORT)"
+      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/*/})"
       id: get_build_tag
     - name: Create and push manifests
       run: |
