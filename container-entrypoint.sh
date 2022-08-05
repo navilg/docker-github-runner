@@ -22,7 +22,7 @@ if [ -z $GHR_TOKEN ]; then
     exit 1
 fi
 
-if [ ! -f /actions-runner/.runner ]; then
+if [ ! -f /runner/actions-runner/.runner ]; then
     /runner/actions-runner/./config.sh --unattended --name $GHR_NAME --labels $GHR_LABELS --url $GHR_URL --token $GHR_TOKEN
 fi
 
