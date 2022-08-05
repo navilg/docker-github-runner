@@ -3,7 +3,7 @@ name: Docker Image CI
 on:
   push:
     # tags:
-    # - 'v*.*.*'
+    # - '*.*.*'
     branches:
       - "main"
   # pull_request:
@@ -37,4 +37,25 @@ jobs:
       run: |
         sudo docker login -u linuxshots -p ${{ secrets.DOCKER_ACCESS_KEY }}
         sudo docker build . --file Dockerfile --tag linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }}
-        sudo docker push linuxshots/github-runner:amd64-$${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker push linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }}
+
+  multiarch-push:
+    runs-on: ARM64
+    needs: 
+    - build-on-arm64
+    - build-on-amd64
+    steps:
+    - uses: actions/checkout@v3
+    - name: Generate build-tag
+      run: echo "##[set-output name=build_tag;]$(echo arm64-${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      id: get_build_tag
+    - name: Build the Docker AMD64 image
+      run: |
+        sudo docker login -u linuxshots -p ${{ secrets.DOCKER_ACCESS_KEY }}
+        sudo docker pull linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker pull linuxshots/github-runner:arm64-${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker manifest create linuxshots/github-runner:${{ steps.get_build_tag.outputs.build_tag }} --amend linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }} --amend linuxshots/github-runner:arm64-${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker manifest create linuxshots/github-runner:latest --amend linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }} --amend linuxshots/github-runner:arm64-${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker manifest push linuxshots/github-runner:latest
+        sudo docker manifest push linuxshots/github-runner:${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker logout -u linuxshots
