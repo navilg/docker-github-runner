@@ -31,7 +31,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Generate build-tag
-      run: echo "##[set-output name=build_tag;]$(echo arm64-${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
       id: get_build_tag
     - name: Build the Docker AMD64 image
       run: |
@@ -47,7 +47,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Generate build-tag
-      run: echo "##[set-output name=build_tag;]$(echo arm64-${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
       id: get_build_tag
     - name: Build the Docker AMD64 image
       run: |
