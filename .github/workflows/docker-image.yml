@@ -17,8 +17,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: FranzDiebold/github-env-vars-action@v2
     - name: Generate build-tag
-      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      run:  echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$CI_SHA_SHORT)"
       id: get_build_tag
     - name: Build the Docker ARM64 image
       run: |
@@ -30,8 +31,9 @@ jobs:
     runs-on: X64
     steps:
     - uses: actions/checkout@v3
+    - uses: FranzDiebold/github-env-vars-action@v2
     - name: Generate build-tag
-      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$CI_SHA_SHORT)"
       id: get_build_tag
     - name: Build the Docker AMD64 image
       run: |
@@ -46,8 +48,9 @@ jobs:
     - build-on-amd64
     steps:
     - uses: actions/checkout@v3
+    - uses: FranzDiebold/github-env-vars-action@v2
     - name: Generate build-tag
-      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$CI_SHA_SHORT)"
       id: get_build_tag
     - name: Build the Docker AMD64 image
       run: |
@@ -58,4 +61,4 @@ jobs:
         sudo docker manifest create linuxshots/github-runner:latest --amend linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }} --amend linuxshots/github-runner:arm64-${{ steps.get_build_tag.outputs.build_tag }}
         sudo docker manifest push linuxshots/github-runner:latest
         sudo docker manifest push linuxshots/github-runner:${{ steps.get_build_tag.outputs.build_tag }}
-        sudo docker logout -u linuxshots
+        sudo docker logout
