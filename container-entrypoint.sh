@@ -24,8 +24,8 @@ fi
 
 if [ ! -z $GHR_DOCKERGID ]; then
     grep -q docker:x:$GHR_DOCKERGID /etc/group || sudo addgroup --gid $GHR_DOCKERGID docker
-    # sudo usermod -aG docker $(whoami)
-    sudo newgrp - docker
+    sudo usermod -aG docker $(whoami)
+    newgrp - docker
 fi
 
 if [ ! -f /actions-runner/.runner ]; then
