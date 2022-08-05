@@ -2,10 +2,10 @@ name: Docker Image CI
 
 on:
   push:
-    # tags:
-    # - '*.*.*'
-    branches:
-      - "main"
+    tags:
+    - '*.*.*'
+    # branches:
+    #   - "main"
   # pull_request:
   #  branches: [ "main" ]
 
@@ -21,7 +21,7 @@ jobs:
     - name: Generate build-tag
       run:  echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$CI_SHA_SHORT)"
       id: get_build_tag
-    - name: Build the Docker ARM64 image
+    - name: Build and push the Docker ARM64 image
       run: |
         sudo docker login -u linuxshots -p ${{ secrets.DOCKER_ACCESS_KEY }}
         sudo docker build . --file Dockerfile.arm64 --tag linuxshots/github-runner:arm64-${{ steps.get_build_tag.outputs.build_tag }}
@@ -35,7 +35,7 @@ jobs:
     - name: Generate build-tag
       run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$CI_SHA_SHORT)"
       id: get_build_tag
-    - name: Build the Docker AMD64 image
+    - name: Build and push the Docker AMD64 image
       run: |
         sudo docker login -u linuxshots -p ${{ secrets.DOCKER_ACCESS_KEY }}
         sudo docker build . --file Dockerfile --tag linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }}
@@ -52,7 +52,7 @@ jobs:
     - name: Generate build-tag
       run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$CI_SHA_SHORT)"
       id: get_build_tag
-    - name: Build the Docker AMD64 image
+    - name: Create and push manifests
       run: |
         sudo docker login -u linuxshots -p ${{ secrets.DOCKER_ACCESS_KEY }}
         sudo docker pull linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }}
