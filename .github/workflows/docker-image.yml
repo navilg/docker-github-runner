@@ -17,26 +17,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set env
-      run: |
-        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        echo "SHORT_SHA=$(git rev-parse --short "$GITHUB_SHA)" >> $GITHUB_ENV
+    - name: Generate build-tag
+      run: echo "##[set-output name=build_tag;]$(echo ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      id: get_build_tag
     - name: Build the Docker ARM64 image
       run: |
         sudo docker login -u linuxshots -p ${{ secrets.DOCKER_ACCESS_KEY }}
-        sudo docker build . --file Dockerfile.arm64 --tag linuxshots/github-runner:arm64-${{ env.RELEASE_VERSION }}-${{ env.SHORT_SHA }}
-        sudo docker push linuxshots/github-runner:arm64-${{ env.RELEASE_VERSION }}-${{ env.SHORT_SHA }}
+        sudo docker build . --file Dockerfile.arm64 --tag linuxshots/github-runner:arm64-${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker push linuxshots/github-runner:arm64-${{ steps.get_build_tag.outputs.build_tag }}
   
   build-on-amd64:
     runs-on: X64
     steps:
     - uses: actions/checkout@v3
-    - name: Set env
-      run: |
-        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        echo "SHORT_SHA=$(git rev-parse --short "$GITHUB_SHA)" >> $GITHUB_ENV
+    - name: Generate build-tag
+      run: echo "##[set-output name=build_tag;]$(echo arm64-${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA"))"
+      id: get_build_tag
     - name: Build the Docker AMD64 image
       run: |
         sudo docker login -u linuxshots -p ${{ secrets.DOCKER_ACCESS_KEY }}
-        sudo docker build . --file Dockerfile --tag linuxshots/github-runner:amd64-${{ env.RELEASE_VERSION }}-${{ env.SHORT_SHA }}
-        sudo docker push linuxshots/github-runner:amd64-${{ env.RELEASE_VERSION }}-${{ env.SHORT_SHA }}
+        sudo docker build . --file Dockerfile --tag linuxshots/github-runner:amd64-${{ steps.get_build_tag.outputs.build_tag }}
+        sudo docker push linuxshots/github-runner:amd64-$${{ steps.get_build_tag.outputs.build_tag }}
