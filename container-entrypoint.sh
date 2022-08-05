@@ -2,9 +2,6 @@
 
 set -e
 
-url=$GHR_URL
-token=$GHR_TOKEN
-
 if [ -z $GHR_NAME ]; then
     echo "GHR_NAME is mandatory environment variable. Use this to give a name to runner."
     exit 1
@@ -27,7 +24,8 @@ fi
 
 if [ ! -z $GHR_DOCKERGID ]; then
     grep -q docker:x:$GHR_DOCKERGID /etc/group || sudo addgroup --gid $GHR_DOCKERGID docker
-    sudo usermod -aG docker $(whoami)
+    # sudo usermod -aG docker $(whoami)
+    sudo newgrp - docker
 fi
 
 if [ ! -f /actions-runner/.runner ]; then

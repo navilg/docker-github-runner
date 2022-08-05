@@ -28,7 +28,7 @@ jobs:
         docker push linuxshots/github-runner:arm64-${{ env.RELEASE_VERSION }}
   
   build-on-amd64:
-    runs-on: X64
+    runs-on: laptop
     steps:
     - uses: actions/checkout@v3
     - name: Set env
